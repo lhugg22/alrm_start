@@ -1,9 +1,10 @@
 package com.create.lou.myapplication;
 
-import android.app.job.JobInfo;
-import android.app.job.JobScheduler;
-import android.content.ComponentName;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.content.Context;
+import android.content.Intent;
+import android.support.v4.app.AlarmManagerCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.widget.CompoundButton;
@@ -15,21 +16,34 @@ import android.widget.TimePicker;
 import org.w3c.dom.Text;
 
 import java.sql.Time;
+import java.util.Calendar;
 
 public class MainActivity extends AppCompatActivity {
 
     private Switch switchOn;
     private SeekBar seekBarAlrms, seekBarMins;
     private TimePicker timePicker;
-    private TextView textValAlamr, textValMin;
-    private JobScheduler mJobScheduler;
+    private TextView textValAlarm, textValMin;
+
+    Context context;                                            //don't know why this was added
+
+    PendingIntent pIntent;
+    Intent mIntent;
+
+    AlarmManager alarm_manager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);                 //set the file activity_main.xml to be the user interface
 
+        //don't know what this is here but
+        this.context = this;
+
+
         initializeVariables();                                  //used to initialize all the variable in used in the interface
+
+        final Calendar calendar = Calendar.getInstance();
 
         switchOn.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener(){
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked){
@@ -37,15 +51,22 @@ public class MainActivity extends AppCompatActivity {
                 seekBarMins.setEnabled(isChecked);
 
                 if(isChecked){
-                    JobInfo.Builder builder = new JobInfo.Builder(1,
-                            new ComponentName( getPackageName(),
-                                    JobSchedulerService.class.getName() ) );
+                    //setting calendar to the time picker in the picker
+                    calendar.set(Calendar.HOUR_OF_DAY, timePicker.getHour() );
+                    calendar.set(Calendar.MINUTE, timePicker.getMinute() );
+
+
+                    pIntent = PendingIntent.getBroadcast(MainActivity.this, 0, mIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+                    alarm_manager.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pIntent);
+                }
+                else{
+                    alarm_manager.cancel(pIntent);
                 }
             }
         });
 
 
-        textValAlamr.setText("Alarms: " + seekBarAlrms.getProgress());                      //This is used to initialize the String value (if I don't have it it says 0 despite starting at 3)
+        textValAlarm.setText("Alarms: " + seekBarAlrms.getProgress());                      //This is used to initialize the String value (if I don't have it it says 0 despite starting at 3)
         textValMin.setText("Mins: " + seekBarMins.getProgress());
 
         seekBarAlrms.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
@@ -62,7 +83,7 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-                textValAlamr.setText("Alarms: " + alrms);
+                textValAlarm.setText("Alarms: " + alrms);
             }
         });
         seekBarMins.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
@@ -99,7 +120,7 @@ public class MainActivity extends AppCompatActivity {
         seekBarAlrms = (SeekBar) findViewById(R.id.seekBarAlrms);
         seekBarMins = (SeekBar) findViewById(R.id.seekBarMins);
         timePicker = (TimePicker) findViewById(R.id.timePicker);
-        textValAlamr = (TextView) findViewById(R.id.textValNumAlrms);
+        textValAlarm = (TextView) findViewById(R.id.textValNumAlrms);
         textValMin = (TextView) findViewById(R.id.textValSnoozeMins);
 
         seekBarAlrms.setEnabled(false);
@@ -109,8 +130,10 @@ public class MainActivity extends AppCompatActivity {
         timePicker.setHour(7);                                             //These should be changed to the values that were
         timePicker.setMinute(15);                                         //set the day before so that it doesn't need to be set everyday
 
-        mJobScheduler = (JobScheduler) getSystemService(Context.JOB_SCHEDULER_SERVICE);
+        alarm_manager = (AlarmManager) getSystemService(ALARM_SERVICE);
 
+        //Setting up the intent to the AlarmReceiver Class
+        mIntent = new Intent(this.context, AlarmReceiver.class);
     }
 
 
