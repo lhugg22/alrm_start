@@ -1,5 +1,9 @@
 package com.create.lou.myapplication;
 
+import android.app.job.JobInfo;
+import android.app.job.JobScheduler;
+import android.content.ComponentName;
+import android.content.Context;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.widget.CompoundButton;
@@ -18,6 +22,7 @@ public class MainActivity extends AppCompatActivity {
     private SeekBar seekBarAlrms, seekBarMins;
     private TimePicker timePicker;
     private TextView textValAlamr, textValMin;
+    private JobScheduler mJobScheduler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,6 +35,12 @@ public class MainActivity extends AppCompatActivity {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked){
                 seekBarAlrms.setEnabled(isChecked);
                 seekBarMins.setEnabled(isChecked);
+
+                if(isChecked){
+                    JobInfo.Builder builder = new JobInfo.Builder(1,
+                            new ComponentName( getPackageName(),
+                                    JobSchedulerService.class.getName() ) );
+                }
             }
         });
 
@@ -54,7 +65,6 @@ public class MainActivity extends AppCompatActivity {
                 textValAlamr.setText("Alarms: " + alrms);
             }
         });
-
         seekBarMins.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             int mins = 0;
             @Override
@@ -72,7 +82,6 @@ public class MainActivity extends AppCompatActivity {
                 textValMin.setText("Mins: " + mins);
             }
         });
-
 
         timePicker.setOnTimeChangedListener(new TimePicker.OnTimeChangedListener() {
             int hour, min = 0;
@@ -99,6 +108,8 @@ public class MainActivity extends AppCompatActivity {
         timePicker.setIs24HourView(true);
         timePicker.setHour(7);                                             //These should be changed to the values that were
         timePicker.setMinute(15);                                         //set the day before so that it doesn't need to be set everyday
+
+        mJobScheduler = (JobScheduler) getSystemService(Context.JOB_SCHEDULER_SERVICE);
 
     }
 
