@@ -1,0 +1,9 @@
+<resources>
+
+    <string name="app_name">Alarms Master</string>
+    <string name="num_alrms">Number of Alarms</string>
+    <string name="snooze_mins">Minutes Between Alarms</string>
+    <string name="val_num_alrms">0</string>
+    <string name="val_snooze_min">1</string>
+
+</resources>
