@@ -25,7 +25,8 @@ public class MainActivity extends AppCompatActivity {
     private TimePicker timePicker;
     private TextView textValAlarm, textValMin;
 
-    Context context;                                            //don't know why this was added
+    //don't know why this was added
+    Context context;
 
     PendingIntent pIntent;
     Intent mIntent;
@@ -35,40 +36,56 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);                 //set the file activity_main.xml to be the user interface
+
+        //set the file activity_main.xml to be the user interface
+        setContentView(R.layout.activity_main);
 
         //don't know what this is here but
         this.context = this;
 
+        //used to initialize all the variable in used in the interface
+        initializeVariables();
 
-        initializeVariables();                                  //used to initialize all the variable in used in the interface
-
+        //making a calendar time so that the alarm can be set to a specific time
         final Calendar calendar = Calendar.getInstance();
 
+        //This is a listener for the main switch that turns on and off the alarms
         switchOn.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener(){
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked){
+
+                //These two enabled methods modify the seekBars and only make them work if the main switch is on
                 seekBarAlrms.setEnabled(isChecked);
                 seekBarMins.setEnabled(isChecked);
 
+                //if the switch is on
                 if(isChecked){
                     //setting calendar to the time picker in the picker
                     calendar.set(Calendar.HOUR_OF_DAY, timePicker.getHour() );
                     calendar.set(Calendar.MINUTE, timePicker.getMinute() );
 
+                    //Adding an extra boolean to give the current state of the switch so that you can immediantly turn off the alarm
+                    mIntent.putExtra("Alarm State", true);
 
                     pIntent = PendingIntent.getBroadcast(MainActivity.this, 0, mIntent, PendingIntent.FLAG_UPDATE_CURRENT);
                     alarm_manager.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pIntent);
                 }
                 else{
+
+                    mIntent.putExtra("Alarm State", false);
+
                     alarm_manager.cancel(pIntent);
+
+                    //Immediantly sends signal to the alarm receiver to ask to stop the belltone
+                    //sendBroadcast(mIntent);
                 }
             }
         });
 
-
-        textValAlarm.setText("Alarms: " + seekBarAlrms.getProgress());                      //This is used to initialize the String value (if I don't have it it says 0 despite starting at 3)
+        //This is used to initialize the String value (if I don't have it it says 0 despite starting at 3)
+        textValAlarm.setText("Alarms: " + seekBarAlrms.getProgress());
         textValMin.setText("Mins: " + seekBarMins.getProgress());
 
+        //setting up the seekBars so that they can't be equal to 0
         seekBarAlrms.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             int alrms = 0;                                                                  //value needs to be initialized in the listener or it crashes the program. this value can be
             @Override                                                                       //access outside the listener through seekbar.getProgress()
@@ -134,6 +151,7 @@ public class MainActivity extends AppCompatActivity {
 
         //Setting up the intent to the AlarmReceiver Class
         mIntent = new Intent(this.context, AlarmReceiver.class);
+
     }
 
 

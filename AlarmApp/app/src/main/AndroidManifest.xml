@@ -18,6 +18,10 @@
         </activity>
 
         <receiver android:name=".AlarmReceiver"/>
+        <service android:name="BellTonePlayService"
+            android:enabled="true">
+
+        </service>
 
     </application>
 
