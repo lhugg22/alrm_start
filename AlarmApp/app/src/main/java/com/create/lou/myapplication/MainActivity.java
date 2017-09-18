@@ -4,9 +4,11 @@ import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.os.SystemClock;
 import android.support.v4.app.AlarmManagerCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.CompoundButton;
 import android.widget.SeekBar;
@@ -49,6 +51,7 @@ public class MainActivity extends AppCompatActivity {
 
         //making a calendar time so that the alarm can be set to a specific time
         final Calendar calendar = Calendar.getInstance();
+        final Calendar currentCal = Calendar.getInstance();
 
         //This is a listener for the main switch that turns on and off the alarms
         switchOn.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener(){
@@ -64,6 +67,18 @@ public class MainActivity extends AppCompatActivity {
                     //setting calendar to the time picker in the picker
                     calendar.set(Calendar.HOUR_OF_DAY, timePicker.getHour() );
                     calendar.set(Calendar.MINUTE, timePicker.getMinute() );
+                    int today = 0;
+                    today = calendar.get(Calendar.DAY_OF_YEAR);
+
+                    if(System.currentTimeMillis() > calendar.getTimeInMillis()){
+                        calendar.set(Calendar.DAY_OF_YEAR, today + 1);
+                    }
+
+
+                    Log.i("Current Time :", "Millis - " + System.currentTimeMillis());
+                    Log.i("Alarm Time :" , "Millis - " + calendar.getTimeInMillis());
+
+
 
                     //Adding an extra boolean to give the current state of the switch so that you can immediantly turn off the alarm
                     mIntent.putExtra("Alarm State", true);
@@ -71,8 +86,10 @@ public class MainActivity extends AppCompatActivity {
                     pIntent = PendingIntent.getBroadcast(MainActivity.this, 0, mIntent, PendingIntent.FLAG_UPDATE_CURRENT);
                     alarm_manager.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pIntent);
 
-                    textAlarmIndex.setText("Alarm set at - " + timePicker.getHour() + ":" + timePicker.getMinute() );
+                    textAlarmIndex.setText("Alarm set at - " + timePicker.getHour() + ":" + timePicker.getMinute());
                     textAlarmIndex.setVisibility(View.VISIBLE);
+
+
 
                 }
                 else{

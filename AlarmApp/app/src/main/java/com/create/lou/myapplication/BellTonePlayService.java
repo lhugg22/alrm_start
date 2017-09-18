@@ -19,7 +19,8 @@ public class BellTonePlayService extends Service {
 
 
     boolean isRunning;
-
+    Uri notification;
+    Ringtone r;
 
     @Nullable
     @Override
@@ -35,12 +36,13 @@ public class BellTonePlayService extends Service {
 
         Log.i("Local Service", "Alarm State: " +  alarmState);
 
-        Uri notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
-        Ringtone r = RingtoneManager.getRingtone(getApplicationContext(), notification);
+
 
 
         if(!this.isRunning && alarmState){
             Log.i("Local Service", "Starting Alarm");
+            notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
+            r = RingtoneManager.getRingtone(getApplicationContext(), notification);
             r.play();
             isRunning = true;
         } else if(this.isRunning && !alarmState){
