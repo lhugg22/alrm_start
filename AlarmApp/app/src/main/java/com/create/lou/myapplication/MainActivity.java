@@ -16,6 +16,7 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.TimePicker;
 
+
 import org.w3c.dom.Text;
 
 import java.sql.Time;
@@ -26,7 +27,9 @@ public class MainActivity extends AppCompatActivity {
     private Switch switchOn;
     private SeekBar seekBarAlrms, seekBarMins;
     private TimePicker timePicker;
-    private TextView textValAlarm, textValMin, textAlarmIndex;
+    private TextView textValAlarm, textValMin, textAlarmIndex, textAlrmDiff;
+
+    boolean pastAlarm;
 
     //don't know why this was added
     Context context;
@@ -51,11 +54,13 @@ public class MainActivity extends AppCompatActivity {
 
         //making a calendar time so that the alarm can be set to a specific time
         final Calendar calendar = Calendar.getInstance();
-        final Calendar currentCal = Calendar.getInstance();
+
 
         //This is a listener for the main switch that turns on and off the alarms
         switchOn.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener(){
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked){
+
+                long diffMillis, lDiffMins, lDiffHours;
 
                 //These two enabled methods modify the seekBars and only make them work if the main switch is on
                 seekBarAlrms.setEnabled(isChecked);
@@ -67,18 +72,23 @@ public class MainActivity extends AppCompatActivity {
                     //setting calendar to the time picker in the picker
                     calendar.set(Calendar.HOUR_OF_DAY, timePicker.getHour() );
                     calendar.set(Calendar.MINUTE, timePicker.getMinute() );
-                    int today = 0;
-                    today = calendar.get(Calendar.DAY_OF_YEAR);
 
+                    //if the calendar is set to a time that has already passed today change it to be for tomorrow
                     if(System.currentTimeMillis() > calendar.getTimeInMillis()){
-                        calendar.set(Calendar.DAY_OF_YEAR, today + 1);
+                        calendar.roll(Calendar.DAY_OF_YEAR, true);
+                        pastAlarm = true;
                     }
 
-
-                    Log.i("Current Time :", "Millis - " + System.currentTimeMillis());
-                    Log.i("Alarm Time :" , "Millis - " + calendar.getTimeInMillis());
-
-
+                    //this will be the amount of time until the alarm goes off
+                    diffMillis = calendar.getTimeInMillis() - System.currentTimeMillis();
+                    lDiffMins = diffMillis / (1000*60);
+                    if(lDiffMins >= 60) {
+                        lDiffHours = diffMillis / (1000*60*60);
+                        lDiffMins = lDiffMins%60;
+                    }
+                    else {
+                        lDiffHours = 0;
+                    }
 
                     //Adding an extra boolean to give the current state of the switch so that you can immediantly turn off the alarm
                     mIntent.putExtra("Alarm State", true);
@@ -89,12 +99,21 @@ public class MainActivity extends AppCompatActivity {
                     textAlarmIndex.setText("Alarm set at - " + timePicker.getHour() + ":" + timePicker.getMinute());
                     textAlarmIndex.setVisibility(View.VISIBLE);
 
+                    textAlrmDiff.setText("Hours: " + lDiffHours + " Mins: " + lDiffMins);
+                    textAlrmDiff.setVisibility(View.VISIBLE);
+
 
 
                 }
                 else{
 
+                    if(pastAlarm){
+                        calendar.roll(Calendar.DAY_OF_YEAR, false);
+                        pastAlarm = false;
+                    }
+
                     textAlarmIndex.setVisibility(View.INVISIBLE);
+                    textAlrmDiff.setVisibility(View.INVISIBLE);
 
                     mIntent.putExtra("Alarm State", false);
 
@@ -166,11 +185,14 @@ public class MainActivity extends AppCompatActivity {
         textValAlarm = (TextView) findViewById(R.id.textValNumAlrms);
         textValMin = (TextView) findViewById(R.id.textValSnoozeMins);
         textAlarmIndex = (TextView) findViewById(R.id.textAlarmInd);
+        textAlrmDiff = (TextView) findViewById(R.id.textAlarmDiff);
 
         seekBarAlrms.setEnabled(false);
         seekBarMins.setEnabled(false);
 
         textAlarmIndex.setVisibility(View.INVISIBLE);
+        textAlrmDiff.setVisibility(View.INVISIBLE);
+
 
         timePicker.setIs24HourView(true);
         timePicker.setHour(7);                                             //These should be changed to the values that were
