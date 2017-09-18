@@ -122,4 +122,17 @@
         app:layout_constraintBottom_toTopOf="@+id/seekBarMins"
         app:layout_constraintRight_toRightOf="@+id/textValNumAlrms" />
 
+    <TextView
+        android:id="@+id/textAlarmInd"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/alarmInd"
+        android:layout_marginTop="8dp"
+        app:layout_constraintTop_toBottomOf="@+id/textSeekBarMins"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginBottom="8dp"
+        android:layout_marginLeft="8dp"
+        app:layout_constraintLeft_toLeftOf="@+id/textSeekBarMins"
+        app:layout_constraintVertical_bias="0.25" />
+
 </android.support.constraint.ConstraintLayout>

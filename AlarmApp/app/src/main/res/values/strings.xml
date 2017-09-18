@@ -5,5 +5,5 @@
     <string name="snooze_mins">Minutes Between Alarms</string>
     <string name="val_num_alrms">0</string>
     <string name="val_snooze_min">1</string>
-
+    <string name="alarmInd">Alarm set at - </string>
 </resources>

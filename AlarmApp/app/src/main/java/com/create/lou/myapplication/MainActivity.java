@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.support.v4.app.AlarmManagerCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.CompoundButton;
 import android.widget.SeekBar;
 import android.widget.Switch;
@@ -23,7 +24,7 @@ public class MainActivity extends AppCompatActivity {
     private Switch switchOn;
     private SeekBar seekBarAlrms, seekBarMins;
     private TimePicker timePicker;
-    private TextView textValAlarm, textValMin;
+    private TextView textValAlarm, textValMin, textAlarmIndex;
 
     //don't know why this was added
     Context context;
@@ -57,6 +58,7 @@ public class MainActivity extends AppCompatActivity {
                 seekBarAlrms.setEnabled(isChecked);
                 seekBarMins.setEnabled(isChecked);
 
+
                 //if the switch is on
                 if(isChecked){
                     //setting calendar to the time picker in the picker
@@ -68,15 +70,22 @@ public class MainActivity extends AppCompatActivity {
 
                     pIntent = PendingIntent.getBroadcast(MainActivity.this, 0, mIntent, PendingIntent.FLAG_UPDATE_CURRENT);
                     alarm_manager.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pIntent);
+
+                    textAlarmIndex.setText("Alarm set at - " + timePicker.getHour() + ":" + timePicker.getMinute() );
+                    textAlarmIndex.setVisibility(View.VISIBLE);
+
                 }
                 else{
 
+                    textAlarmIndex.setVisibility(View.INVISIBLE);
+
                     mIntent.putExtra("Alarm State", false);
+
+                    //Immediantly sends signal to the alarm receiver to ask to stop the belltone
+                    sendBroadcast(mIntent);
 
                     alarm_manager.cancel(pIntent);
 
-                    //Immediantly sends signal to the alarm receiver to ask to stop the belltone
-                    //sendBroadcast(mIntent);
                 }
             }
         });
@@ -139,9 +148,12 @@ public class MainActivity extends AppCompatActivity {
         timePicker = (TimePicker) findViewById(R.id.timePicker);
         textValAlarm = (TextView) findViewById(R.id.textValNumAlrms);
         textValMin = (TextView) findViewById(R.id.textValSnoozeMins);
+        textAlarmIndex = (TextView) findViewById(R.id.textAlarmInd);
 
         seekBarAlrms.setEnabled(false);
         seekBarMins.setEnabled(false);
+
+        textAlarmIndex.setVisibility(View.INVISIBLE);
 
         timePicker.setIs24HourView(true);
         timePicker.setHour(7);                                             //These should be changed to the values that were

@@ -18,6 +18,8 @@ import android.widget.Toast;
 public class BellTonePlayService extends Service {
 
 
+    boolean isRunning;
+
 
     @Nullable
     @Override
@@ -33,19 +35,22 @@ public class BellTonePlayService extends Service {
 
         Log.i("Local Service", "Alarm State: " +  alarmState);
 
-        //I might have to change the getAppContext to context passed by the intent?
-
         Uri notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
         Ringtone r = RingtoneManager.getRingtone(getApplicationContext(), notification);
-        //r.play();
 
 
-        if(alarmState) {
-            //this code snippet is used to play the default alarm tone
+        if(!this.isRunning && alarmState){
+            Log.i("Local Service", "Starting Alarm");
             r.play();
-        }
-        else {
+            isRunning = true;
+        } else if(this.isRunning && !alarmState){
             r.stop();
+            Log.i("Local Service", "Stopping Alarm");
+            isRunning = false;
+        } else if(!this.isRunning && !alarmState){
+            Log.i("Local Service", "Not Alarming, why am I in PlayService");
+        } else if(this.isRunning && alarmState){
+            Log.i("Local Service", "Alarm Running");
         }
 
 
