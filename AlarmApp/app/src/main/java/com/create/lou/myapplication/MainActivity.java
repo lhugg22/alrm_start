@@ -4,12 +4,14 @@ import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.SystemClock;
 import android.support.v4.app.AlarmManagerCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.SeekBar;
 import android.widget.Switch;
@@ -28,8 +30,12 @@ public class MainActivity extends AppCompatActivity {
     private SeekBar seekBarAlrms, seekBarMins;
     private TimePicker timePicker;
     private TextView textValAlarm, textValMin, textAlarmIndex, textAlrmDiff;
+    private Button testButton, ackButton;
+    SharedPreferences sharedPref;
+    SharedPreferences.Editor editor;
 
     boolean pastAlarm;
+    int numAlarms, numMins;
 
     //making a calendar time so that the alarm can be set to a specific time
     final Calendar calendar = Calendar.getInstance();
@@ -64,6 +70,24 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        /*
+        testButton.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View view) {
+                mIntent.putExtra("Alarm State", true);
+                sendBroadcast( mIntent);
+            }
+        });
+
+        ackButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mIntent.putExtra("Alarm State", false);
+                sendBroadcast( mIntent);
+            }
+        });
+        */
 
         //This is a listener for the main switch that turns on and off the alarms
         switchOn.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener(){
@@ -78,6 +102,7 @@ public class MainActivity extends AppCompatActivity {
                 //if the switch is on
                 if(isChecked){
 
+
                     updateTimeDisplay( timePicker.getHour(), timePicker.getMinute() );
 
                     //Adding an extra boolean to give the current state of the switch so that you can immediantly turn off the alarm
@@ -86,13 +111,8 @@ public class MainActivity extends AppCompatActivity {
                     pIntent = PendingIntent.getBroadcast(MainActivity.this, 0, mIntent, PendingIntent.FLAG_UPDATE_CURRENT);
                     alarm_manager.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pIntent);
 
-                    //textAlarmIndex.setText("Alarm set at - " + timePicker.getHour() + ":" + timePicker.getMinute());
                     textAlarmIndex.setVisibility(View.VISIBLE);
-
-                    //textAlrmDiff.setText("Hours: " + lDiffHours + " Mins: " + lDiffMins);
                     textAlrmDiff.setVisibility(View.VISIBLE);
-
-
 
                 }
                 else{
@@ -123,6 +143,7 @@ public class MainActivity extends AppCompatActivity {
             @Override                                                                       //access outside the listener through seekbar.getProgress()
             public void onProgressChanged(SeekBar seekBar, int i, boolean b) {              //I don't want there to be 0 alarms because then it would not wake me up
                 alrms = i + 1;
+                numAlarms = alrms;
             }
 
             @Override
@@ -140,6 +161,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
                 mins = i + 1;                                                           //I don't want there to be 0 mins between alarms because then there is just 1 alarm
+                numMins = mins;
             }
 
             @Override
@@ -164,6 +186,8 @@ public class MainActivity extends AppCompatActivity {
         textValMin = (TextView) findViewById(R.id.textValSnoozeMins);
         textAlarmIndex = (TextView) findViewById(R.id.textAlarmInd);
         textAlrmDiff = (TextView) findViewById(R.id.textAlarmDiff);
+        //testButton = (Button) findViewById(R.id.button);
+        //ackButton = (Button) findViewById(R.id.buttonAck);
 
         seekBarAlrms.setEnabled(false);
         seekBarMins.setEnabled(false);
@@ -181,6 +205,9 @@ public class MainActivity extends AppCompatActivity {
         //Setting up the intent to the AlarmReceiver Class
         mIntent = new Intent(this.context, AlarmReceiver.class);
 
+        //this is creating a file to store alarms -- file name is AlarmStorage...idk where it stores it
+        //sharedPref = context.getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
+        //editor = sharedPref.edit();
     }
 
     //this function is for updating the display of the chosen alarm time
