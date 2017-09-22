@@ -8,4 +8,10 @@
     <string name="alarmInd">Alarm set at - </string>
     
     <string name="preference_file_key">AlarmStorage</string>
+    <string name="Alarm_Hour">Alarm Hour</string>
+    <string name="Alarm_Min">Alarm Min</string>
+    <string name="num_Alarm">Number of Alarms</string>
+    <string name="num_Mins">Number of Minutes</string>
+    <string name="alarm_On">Alarm State</string>
+
 </resources>

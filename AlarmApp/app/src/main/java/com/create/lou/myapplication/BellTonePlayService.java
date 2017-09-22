@@ -18,6 +18,8 @@ import android.widget.Toast;
 import android.support.v4.app.NotificationManagerCompat;
 import android.support.v7.app.AppCompatActivity;
 
+import static android.content.Intent.FLAG_ACTIVITY_PREVIOUS_IS_TOP;
+
 /**
  * Created by lou on 9/14/17.
  */
@@ -28,10 +30,6 @@ public class BellTonePlayService extends Service {
     boolean isRunning;
     Uri notification;
     Ringtone r;
-
-    //make an intent to get back to the main activity
-    Intent mainIntent = new Intent(this.getApplicationContext(), MainActivity.class);
-    PendingIntent pMainIntent = PendingIntent.getActivity(this, 0, mainIntent, 0);
 
     @Nullable
     @Override
@@ -45,6 +43,7 @@ public class BellTonePlayService extends Service {
 
         Boolean alarmState = intent.getExtras().getBoolean("Alarm State");
 
+
         Log.i("Local Service", "Alarm State: " +  alarmState);
 
         if(!this.isRunning && alarmState){
@@ -53,39 +52,6 @@ public class BellTonePlayService extends Service {
             r = RingtoneManager.getRingtone(getApplicationContext(), notification);
             r.play();
             notifyMessage();
-
-
-
-
-            //set up Notifications Manager called mNM (my Notification Manager)
-//
-//            NotificationManager mNM = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-            //    String id = "my_Channel_01";
-            //    String name = "Alarm1";
-            //    int importance = NotificationManager.IMPORTANCE_LOW;
-            //NotificationChannel mChannel = new NotificationChannel(id, name, importance);
-
-            /*
-            NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this)
-                    .setSmallIcon(R.mipmap.ic_launcher)
-                    .setContentTitle("Alarm!")
-                    .setContentText("Wake Up!")
-                    .setContentIntent(pMainIntent)
-                    .setAutoCancel(true);
-            */
-
-//            Notification alrmNotify = new Notification.Builder(this)
-//                    .setContentTitle("Wake Up!")
-//                    .setContentText("Click Here")
-//                    //.setContentIntent(pMainIntent)
-//                    .setSmallIcon(R.mipmap.ic_launcher)
-////                    .setAutoCancel(true)
-//                    .build();
-//
-//
-//            NotificationManager mNM = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-//            mNM.notify(1, alrmNotify);//mBuilder.build());
-
 
             isRunning = true;
         } else if(this.isRunning && !alarmState){
@@ -108,18 +74,22 @@ public class BellTonePlayService extends Service {
     }
 
     public void notifyMessage(){
+
+        Intent mainIntent = new Intent(this.getApplicationContext(), MainActivity.class);
+        PendingIntent pMainIntent = PendingIntent.getActivity(this, 0, mainIntent, 0);
+
         Notification alrmNotify = new android.support.v7.app.NotificationCompat.Builder(this)
                 .setContentTitle("Wake Up!")
                 .setContentText("Click Here")
                 .setContentIntent(pMainIntent)
                 .setSmallIcon(R.mipmap.ic_launcher)
                 .setVibrate( new long[]{1000, 1000})
-                //.setAutoCancel(true)
+                .setAutoCancel(true)
                 .build();
 
 
-        NotificationManagerCompat mNM = NotificationManagerCompat.from(this); //(NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-        mNM.notify(1, alrmNotify);//mBuilder.build());
+        NotificationManagerCompat mNM = NotificationManagerCompat.from(this);
+        mNM.notify(1, alrmNotify);
     }
 
 }
