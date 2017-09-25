@@ -31,6 +31,8 @@ public class BellTonePlayService extends Service {
     Uri notification;
     Ringtone r;
 
+    Intent snzIntent;// = new Intent(getApplicationContext(),AlarmReceiver.class);
+
     @Nullable
     @Override
     public IBinder onBind(Intent intent){
@@ -52,6 +54,9 @@ public class BellTonePlayService extends Service {
             r = RingtoneManager.getRingtone(getApplicationContext(), notification);
             r.play();
             notifyMessage();
+
+            snzIntent = new Intent(getApplicationContext(), SnoozeActivity.class);
+            startActivity(snzIntent);
 
             isRunning = true;
         } else if(this.isRunning && !alarmState){

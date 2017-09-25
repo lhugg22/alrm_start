@@ -25,7 +25,10 @@
             android:name=".BellTonePlayService"
             android:enabled="true"></service>
 
-        <activity android:name=".SnoozeActivity"></activity>
+        <activity
+            android:name=".SnoozeActivity"
+            android:showOnLockScreen="true"
+            android:parentActivityName=".MainActivity"></activity>
     </application>
 
 </manifest>

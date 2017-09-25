@@ -31,7 +31,7 @@ public class MainActivity extends AppCompatActivity {
     private SeekBar seekBarAlrms, seekBarMins;
     private TimePicker timePicker;
     private TextView textValAlarm, textValMin, textAlarmIndex, textAlrmDiff;
-    //private Button testButton, ackButton;
+    private Button testButton, ackButton;
 
     //these are for saving the user data
     SharedPreferences sharedPref;
@@ -50,6 +50,7 @@ public class MainActivity extends AppCompatActivity {
     //used to get to the Alarm Receiver class
     PendingIntent pIntent;
     Intent mIntent;
+    Intent snzIntent;
 
     //used in conjunction with the intents to schedule getting to the Alarm Receiver class
     AlarmManager alarm_manager;
@@ -78,24 +79,29 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        /*
-        testButton.setOnClickListener(new View.OnClickListener() {
 
-            @Override
-            public void onClick(View view) {
-                mIntent.putExtra("Alarm State", true);
-                sendBroadcast( mIntent);
-            }
-        });
+         testButton.setOnClickListener(new View.OnClickListener() {
 
-        ackButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                mIntent.putExtra("Alarm State", false);
-                sendBroadcast( mIntent);
-            }
-        });
-        */
+             @Override
+             public void onClick(View view) {
+                 //mIntent.putExtra("Alarm State", true);
+                 //sendBroadcast( mIntent);
+
+                 //snzIntent.putExtra();
+                 startActivity(snzIntent);
+
+             }
+         });
+
+
+         ackButton.setOnClickListener(new View.OnClickListener() {
+             @Override
+             public void onClick(View view) {
+                 mIntent.putExtra("Alarm State", false);
+                 sendBroadcast( mIntent);
+             }
+         });
+
 
         //This is a listener for the main switch that turns on and off the alarms
         switchOn.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener(){
@@ -165,7 +171,7 @@ public class MainActivity extends AppCompatActivity {
         sharedPref = context.getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
         editor = sharedPref.edit();
 
-        //bool for wether the alarm was left on or off - default is off
+        //bool for whether the alarm was left on or off - default is off
         alarmOn = sharedPref.getBoolean(getResources().getString(R.string.alarm_On), false);
 
         //switch in UI
@@ -193,8 +199,8 @@ public class MainActivity extends AppCompatActivity {
         textValMin = (TextView) findViewById(R.id.textValSnoozeMins);
         textAlarmIndex = (TextView) findViewById(R.id.textAlarmInd);
         textAlrmDiff = (TextView) findViewById(R.id.textAlarmDiff);
-        //testButton = (Button) findViewById(R.id.button);
-        //ackButton = (Button) findViewById(R.id.buttonAck);
+        testButton = (Button) findViewById(R.id.button);
+        ackButton = (Button) findViewById(R.id.buttonAck);
 
         //if the alarm is off make the Alarm time display invisible and the time till alarm
         if(!alarmOn) {
@@ -210,6 +216,7 @@ public class MainActivity extends AppCompatActivity {
 
         //Setting up the intent to the AlarmReceiver Class
         mIntent = new Intent(this.context, AlarmReceiver.class);
+        snzIntent = new Intent(this.context , SnoozeActivity.class);
 
 
     }

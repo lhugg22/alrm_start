@@ -27,7 +27,10 @@ public class AlarmReceiver extends BroadcastReceiver {
 
         //used to pass the current switch state to the BellTonePlayer so that the alarm can be immediantly stopped
         mIntent.putExtra("Alarm State", getAlarmState);
+
         context.startService(mIntent);
+
+
 
         Log.e("Thru Receiver", "On to Play Service");
     }
