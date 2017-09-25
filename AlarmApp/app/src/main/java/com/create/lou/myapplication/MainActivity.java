@@ -108,43 +108,8 @@ public class MainActivity extends AppCompatActivity {
 
                 alarmOn = isChecked;
 
-                //updateTimeDisplay();
-
                 updateCalendar();
 
-                mIntent.putExtra("Alarm State", isChecked);
-                pIntent = PendingIntent.getBroadcast(MainActivity.this, 0, mIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-
-                //if the switch is on
-                if(isChecked){
-
-                    //updateTimeDisplay();
-
-                    //Adding an extra boolean to give the current state of the switch so that you can immediantly turn off the alarm
-                    //mIntent.putExtra("Alarm State", true);
-
-                    //pIntent = PendingIntent.getBroadcast(MainActivity.this, 0, mIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-                    alarm_manager.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pIntent);
-
-                    textAlarmIndex.setVisibility(View.VISIBLE);
-                    textAlrmDiff.setVisibility(View.VISIBLE);
-
-                }
-                else{
-
-                    //updateTimeDisplay();
-
-                    textAlarmIndex.setVisibility(View.INVISIBLE);
-                    textAlrmDiff.setVisibility(View.INVISIBLE);
-
-                    //mIntent.putExtra("Alarm State", false);
-
-                    //Immediantly sends signal to the alarm receiver to ask to stop the belltone
-                    sendBroadcast(mIntent);
-
-                    alarm_manager.cancel(pIntent);
-
-                }
             }
         });
 
@@ -252,6 +217,16 @@ public class MainActivity extends AppCompatActivity {
     //this function is for updating the display of the chosen alarm time
     private  void updateTimeDisplay(){
 
+        if(alarmOn){
+            textAlarmIndex.setVisibility(View.VISIBLE);
+            textAlrmDiff.setVisibility(View.VISIBLE);
+        }
+        else
+        {
+            textAlarmIndex.setVisibility(View.INVISIBLE);
+            textAlrmDiff.setVisibility(View.INVISIBLE);
+        }
+
         long diffMillis, lDiffMins, lDiffHours;
 
         //this will be the amount of time until the alarm goes off
@@ -292,6 +267,20 @@ public class MainActivity extends AppCompatActivity {
         if(System.currentTimeMillis() > calendar.getTimeInMillis()){
             calendar.roll(Calendar.DAY_OF_YEAR, true);
             pastAlarm = true;
+        }
+
+        mIntent.putExtra("Alarm State", alarmOn);
+        pIntent = PendingIntent.getBroadcast(MainActivity.this, 0, mIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        //if the switch is on
+        if(alarmOn){
+            alarm_manager.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pIntent);
+        }
+        else{
+            //Immediantly sends signal to the alarm receiver to ask to stop the belltone
+            sendBroadcast(mIntent);
+
+            alarm_manager.cancel(pIntent);
         }
 
         updateTimeDisplay();
