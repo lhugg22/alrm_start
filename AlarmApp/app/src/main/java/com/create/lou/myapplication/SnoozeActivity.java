@@ -52,7 +52,7 @@ public class SnoozeActivity extends AppCompatActivity {
         });
 
         MainActivity mAct = new MainActivity();
-        mAct.calendar.add(Calendar.MINUTE, x);
+        //mAct.calendar.add(Calendar.MINUTE, x);
 
     }
 
