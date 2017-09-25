@@ -38,18 +38,18 @@ public class MainActivity extends AppCompatActivity {
     SharedPreferences.Editor editor;
 
     //these are the variables used throughout the app
-    private boolean pastAlarm, alarmOn;
-    private int mHours, mMins, numAlarms, numMins;
+    private boolean alarmOn;
+    //private int mHours, mMins, numAlarms, numMins;
 
     //making a calendar time so that the alarm can be set to a specific time
-    final Calendar calendar = Calendar.getInstance();
+    //final Calendar calendar = Calendar.getInstance();
 
     //don't know why this was added
     Context context;
 
     //used to get to the Alarm Receiver class
-    PendingIntent pIntent;
-    Intent mIntent;
+    //PendingIntent pIntent;
+    //Intent mIntent;
     Intent snzIntent;
 
     //used in conjunction with the intents to schedule getting to the Alarm Receiver class
@@ -74,7 +74,7 @@ public class MainActivity extends AppCompatActivity {
             public void onTimeChanged(TimePicker timePicker, int hour, int min) {
 
                 //updateTimeDisplay();
-                updateCalendar();
+                updateCalendar( hour, min);
 
             }
         });
@@ -94,6 +94,7 @@ public class MainActivity extends AppCompatActivity {
          });
 
 
+        /*
          ackButton.setOnClickListener(new View.OnClickListener() {
              @Override
              public void onClick(View view) {
@@ -101,6 +102,7 @@ public class MainActivity extends AppCompatActivity {
                  sendBroadcast( mIntent);
              }
          });
+         */
 
 
         //This is a listener for the main switch that turns on and off the alarms
@@ -114,14 +116,14 @@ public class MainActivity extends AppCompatActivity {
 
                 alarmOn = isChecked;
 
-                updateCalendar();
+                updateCalendar(timePicker.getHour(), timePicker.getMinute());
 
             }
         });
 
         //This is used to initialize the String value (if I don't have it it says 0 despite starting at 3)
-        textValAlarm.setText("Alarms: " + numAlarms);
-        textValMin.setText("Mins: " + numMins);
+        textValAlarm.setText("Alarms: " + seekBarAlrms.getProgress());
+        textValMin.setText("Mins: " + seekBarMins.getProgress());
 
         //setting up the seekBars so that they can't be equal to 0
         seekBarAlrms.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
@@ -129,7 +131,7 @@ public class MainActivity extends AppCompatActivity {
             @Override                                                                       //access outside the listener through seekbar.getProgress()
             public void onProgressChanged(SeekBar seekBar, int i, boolean b) {              //I don't want there to be 0 alarms because then it would not wake me up
                 alrms = i + 1;
-                numAlarms = alrms;
+                //numAlarms = alrms;
             }
 
             @Override
@@ -147,7 +149,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
                 mins = i + 1;                                                           //I don't want there to be 0 mins between alarms because then there is just 1 alarm
-                numMins = mins;
+                //numMins = mins;
             }
 
             @Override
@@ -215,14 +217,19 @@ public class MainActivity extends AppCompatActivity {
         alarm_manager = (AlarmManager) getSystemService(ALARM_SERVICE);
 
         //Setting up the intent to the AlarmReceiver Class
-        mIntent = new Intent(this.context, AlarmReceiver.class);
+        //mIntent = new Intent(this.context, AlarmReceiver.class);
         snzIntent = new Intent(this.context , SnoozeActivity.class);
 
 
     }
 
     //this function is for updating the display of the chosen alarm time
-    private  void updateTimeDisplay(){
+    private  void updateTimeDisplay(int hour, int mins){
+
+        final Calendar calendar = Calendar.getInstance();
+
+        calendar.set(Calendar.HOUR_OF_DAY, hour);
+        calendar.set(Calendar.MINUTE, mins);
 
         if(alarmOn){
             textAlarmIndex.setVisibility(View.VISIBLE);
@@ -247,37 +254,45 @@ public class MainActivity extends AppCompatActivity {
             lDiffHours = 0;
         }
 
-        if(mMins < 10) {
-            textAlarmIndex.setText("Alarm set at - " + mHours + ":0" + mMins);
+        if(mins < 10) {
+            textAlarmIndex.setText("Alarm set at - " + hour + ":0" + mins);
         } else{
-            textAlarmIndex.setText("Alarm set at - " + mHours + ":" + mMins);
+            textAlarmIndex.setText("Alarm set at - " + hour + ":" + mins);
         }
         textAlrmDiff.setText("Hours: " + lDiffHours + " Mins: " + lDiffMins);
     }
 
-    private  void updateCalendar(){
+    private  void updateCalendar(int hour, int mins){
 
-        mMins = timePicker.getMinute();
-        mHours = timePicker.getHour();
-        numAlarms = seekBarAlrms.getProgress();
-        numMins = seekBarMins.getProgress();
+        final Calendar calendar = Calendar.getInstance();
+        Intent mIntent = new Intent(this.context, AlarmReceiver.class);
+        mIntent.putExtra("Alarm State", alarmOn);
+        PendingIntent pIntent = PendingIntent.getBroadcast(MainActivity.this, 0, mIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
-        calendar.set(Calendar.HOUR_OF_DAY, mHours );
-        calendar.set(Calendar.MINUTE, mMins);
+        //boolean pastAlarm = false;
 
+        //mMins = timePicker.getMinute();
+        //mHours = timePicker.getHour();
+        //numAlarms = seekBarAlrms.getProgress();
+        //numMins = seekBarMins.getProgress();
+
+        calendar.set(Calendar.HOUR_OF_DAY, hour );
+        calendar.set(Calendar.MINUTE, mins);
+
+        /*
         if(pastAlarm){
             calendar.roll(Calendar.DAY_OF_YEAR, false);
             pastAlarm = false;
         }
+        */
 
         //if the calendar is set to a time that has already passed today change it to be for tomorrow
         if(System.currentTimeMillis() > calendar.getTimeInMillis()){
             calendar.roll(Calendar.DAY_OF_YEAR, true);
-            pastAlarm = true;
+            //pastAlarm = true;
         }
 
-        mIntent.putExtra("Alarm State", alarmOn);
-        pIntent = PendingIntent.getBroadcast(MainActivity.this, 0, mIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        //pIntent = PendingIntent.getBroadcast(MainActivity.this, 0, mIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         //if the switch is on
         if(alarmOn){
@@ -290,16 +305,16 @@ public class MainActivity extends AppCompatActivity {
             alarm_manager.cancel(pIntent);
         }
 
-        updateTimeDisplay();
+        updateTimeDisplay(calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), alrmSwitch);
     }
 
     @Override
     public void onStop(){
         //store the shared Preferences stuff ie alarm hour, min, numbAlarms, numbMins
-        editor.putInt( getResources().getString(R.string.Alarm_Hour) , mHours);
-        editor.putInt( getResources().getString(R.string.Alarm_Min) , mMins);
-        editor.putInt( getResources().getString(R.string.num_Alarm) , numAlarms);
-        editor.putInt( getResources().getString(R.string.num_Mins) , numMins);
+        editor.putInt( getResources().getString(R.string.Alarm_Hour) , timePicker.getHour());
+        editor.putInt( getResources().getString(R.string.Alarm_Min) , timePicker.getMinute());
+        editor.putInt( getResources().getString(R.string.num_Alarm) , seekBarAlrms.getProgress());
+        editor.putInt( getResources().getString(R.string.num_Mins) , seekBarMins.getProgress());
         editor.putBoolean( getResources().getString(R.string.alarm_On) , alarmOn);
         editor.apply();
 
