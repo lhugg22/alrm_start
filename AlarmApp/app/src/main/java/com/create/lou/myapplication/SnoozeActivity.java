@@ -3,7 +3,7 @@ package com.create.lou.myapplication;
 import android.app.WallpaperManager;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
-import android.icu.util.Calendar;
+//import android.icu.util.Calendar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutCompat;
@@ -12,12 +12,15 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
 
+import java.util.Calendar;
+
 public class SnoozeActivity extends AppCompatActivity {
 
 
     private Button snoozeBtn;
+    private int snzCnt;
 
-    Intent stopIntent;
+    Intent stopIntent, snoozeIntent;
 
 
     @Override
@@ -44,16 +47,19 @@ public class SnoozeActivity extends AppCompatActivity {
                 stopIntent.putExtra("Alarm State", false);
                 sendBroadcast( stopIntent);
 
+                updateCal();
+
                 //send a bool flag to the main activity so that it knows the alarm has been snoozed
+                //snoozeIntent.putExtra("Snz State", snzCnt);
+                //startActivity(snoozeIntent);
 
                 System.exit(0);
 
             }
         });
 
-        MainActivity mAct = new MainActivity();
-        //mAct.calendar.add(Calendar.MINUTE, x);
-
+        //MainActivity mAct = new MainActivity();
+        //mAct.updateCalendar();
     }
 
     @Override
@@ -69,6 +75,22 @@ public class SnoozeActivity extends AppCompatActivity {
         snoozeBtn = (Button) findViewById(R.id.buttonSnooze);
 
         stopIntent = new Intent(SnoozeActivity.this , AlarmReceiver.class);
+        snoozeIntent = new Intent(SnoozeActivity.this, MainActivity.class);
+
+    }
+
+    private void updateCal(){
+        snzCnt++;
+
+        MainActivity mAct = new MainActivity();
+
+        if(snzCnt < mAct.sharedPref.getInt(getResources().getString(R.string.num_alrms), 2) ){
+
+            final Calendar calCurrent = Calendar.getInstance();
+            calCurrent.add(Calendar.MINUTE, mAct.sharedPref.getInt(getResources().getString(R.string.num_Mins), 1));
+
+            mAct.updateCalendar(calCurrent.get(Calendar.HOUR_OF_DAY), calCurrent.get(Calendar.MINUTE));
+        }
 
     }
 
