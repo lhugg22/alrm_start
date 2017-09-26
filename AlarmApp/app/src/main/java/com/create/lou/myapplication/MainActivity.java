@@ -28,7 +28,7 @@ public class MainActivity extends AppCompatActivity {
 
     //these are the different UI objects
     private Switch switchOn;
-    public SeekBar seekBarAlrms, seekBarMins;
+    private SeekBar seekBarAlrms, seekBarMins;
     private TimePicker timePicker;
     private TextView textValAlarm, textValMin, textAlarmIndex, textAlrmDiff;
     //private Button testButton, ackButton;
@@ -270,10 +270,10 @@ public class MainActivity extends AppCompatActivity {
     /*private*/ public void updateCalendar(int hour, int mins){
 
         final Calendar calendar = Calendar.getInstance();
-        Intent mIntent = new Intent(this.context, AlarmReceiver.class);
-        mIntent.putExtra("Alarm State", switchOn.isChecked());
-        mIntent.putExtra("Snooze Min" , seekBarMins.getProgress() + 1);
-        mIntent.putExtra("Snooze Count", seekBarAlrms.getProgress() + 1);
+        Intent mIntent = new Intent(/*this.context*/ getApplicationContext(), AlarmReceiver.class);
+        mIntent.putExtra(getResources().getString(R.string.Ex_Alarm_State), switchOn.isChecked());
+        mIntent.putExtra(getResources().getString(R.string.Ex_Snooze_Min), seekBarMins.getProgress() + 1);
+        mIntent.putExtra(getResources().getString(R.string.Ex_Alarm_Num), seekBarAlrms.getProgress() + 1);
         PendingIntent pIntent = PendingIntent.getBroadcast(MainActivity.this, 0, mIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         AlarmManager alarm_manager = (AlarmManager) getSystemService(ALARM_SERVICE);
 

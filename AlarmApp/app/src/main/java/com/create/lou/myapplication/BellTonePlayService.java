@@ -56,6 +56,9 @@ public class BellTonePlayService extends Service {
             notifyMessage();
 
             snzIntent = new Intent(getApplicationContext(), SnoozeActivity.class);
+            snzIntent.putExtra("Alarm State", intent.getExtras().getBoolean("Alarm State"));
+            snzIntent.putExtra("Snooze Minutes", intent.getExtras().getInt("Snooze Minutes"));
+            snzIntent.putExtra("Number of Alarms", intent.getExtras().getInt("Number of Alarms"));
             startActivity(snzIntent);
 
             isRunning = true;
