@@ -53,6 +53,7 @@
         android:layout_marginEnd="8dp"
         android:layout_marginRight="8dp"
         android:max="14"
+        android:min="1"
         android:progress="3"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
@@ -71,6 +72,7 @@
         android:layout_marginEnd="8dp"
         android:layout_marginRight="8dp"
         android:max="9"
+        android:min="1"
         android:progress="3"
         app:layout_constraintBottom_toTopOf="@+id/seekBarMins"
         app:layout_constraintRight_toRightOf="parent"
@@ -148,25 +150,5 @@
         app:layout_constraintTop_toTopOf="@+id/textAlarmInd"
         android:layout_marginStart="8dp"
         android:layout_marginEnd="8dp" />
-
-    <Button
-        android:id="@+id/button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:text="TestAlarm"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textAlarmInd"
-        app:layout_constraintRight_toLeftOf="@+id/buttonAck" />
-
-    <Button
-        android:id="@+id/buttonAck"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:text="Ack"
-        app:layout_constraintLeft_toRightOf="@+id/button"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textAlarmDiff" />
 
 </android.support.constraint.ConstraintLayout>

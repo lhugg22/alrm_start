@@ -13,6 +13,7 @@
     <string name="num_Alarm">Number of Alarms</string>
     <string name="num_Mins">Number of Minutes</string>
     <string name="alarm_On">Alarm State</string>
+    <string name="alarm_Counter">Alarm Counter</string>
 
     <string name="Ex_Alarm_State">Alarm State</string>
     <string name="Ex_Snooze_Min">Snooze Minutes</string>

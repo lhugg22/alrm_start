@@ -5,23 +5,16 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.SystemClock;
-import android.support.v4.app.AlarmManagerCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.SeekBar;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.TimePicker;
 
-
-import org.w3c.dom.Text;
-
-import java.sql.Time;
 import java.util.Calendar;
 
 public class MainActivity extends AppCompatActivity {
@@ -31,29 +24,13 @@ public class MainActivity extends AppCompatActivity {
     private SeekBar seekBarAlrms, seekBarMins;
     private TimePicker timePicker;
     private TextView textValAlarm, textValMin, textAlarmIndex, textAlrmDiff;
-    //private Button testButton, ackButton;
 
     //these are for saving the user data
     SharedPreferences sharedPref;
     SharedPreferences.Editor editor;
 
-    //these are the variables used throughout the app
-    //private boolean alarmOn;
-    //private int mHours, mMins, numAlarms, numMins;
-
-    //making a calendar time so that the alarm can be set to a specific time
-    //final Calendar calendar = Calendar.getInstance();
-
     //don't know why this was added
     Context context;
-
-    //used to get to the Alarm Receiver class
-    //PendingIntent pIntent;
-    //Intent mIntent;
-    //Intent snzIntent;
-
-    //used in conjunction with the intents to schedule getting to the Alarm Receiver class
-    //AlarmManager alarm_manager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,66 +50,35 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onTimeChanged(TimePicker timePicker, int hour, int min) {
 
-                //updateTimeDisplay();
+                //if the time is changed update the calendar so that we know what the current desired alarm time is
                 updateCalendar( hour, min);
 
             }
         });
 
 
-        /*
-         testButton.setOnClickListener(new View.OnClickListener() {
-
-             @Override
-             public void onClick(View view) {
-                 //mIntent.putExtra("Alarm State", true);
-                 //sendBroadcast( mIntent);
-
-                 //snzIntent.putExtra();
-                 startActivity(snzIntent);
-
-             }
-         });
-        */
-
-        /*
-         ackButton.setOnClickListener(new View.OnClickListener() {
-             @Override
-             public void onClick(View view) {
-                 mIntent.putExtra("Alarm State", false);
-                 sendBroadcast( mIntent);
-             }
-         });
-         */
-
-
         //This is a listener for the main switch that turns on and off the alarms
         switchOn.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener(){
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked){
-
 
                 //These two enabled methods modify the seekBars and only make them work if the main switch is on
                 seekBarAlrms.setEnabled(isChecked);
                 seekBarMins.setEnabled(isChecked);
 
-                //alarmOn = isChecked;
-
+                //if the switch is turned on set the alarm manager to the correct time
                 updateCalendar(timePicker.getHour(), timePicker.getMinute());
-
             }
         });
 
-        //This is used to initialize the String value (if I don't have it it says 0 despite starting at 3)
+        //This is used to initialize the String value
         textValAlarm.setText("Alarms: " + seekBarAlrms.getProgress());
         textValMin.setText("Mins: " + seekBarMins.getProgress());
 
-        //setting up the seekBars so that they can't be equal to 0
+        //this is used to pick how many times the alarm will go off
         seekBarAlrms.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            //int alrms = 0;                                                                  //value needs to be initialized in the listener or it crashes the program. this value can be
-            @Override                                                                       //access outside the listener through seekbar.getProgress()
+            @Override
             public void onProgressChanged(SeekBar seekBar, int i, boolean b) {              //I don't want there to be 0 alarms because then it would not wake me up
-                //alrms = i + 1;
-                //numAlarms = alrms;
+                updateCalendar(timePicker.getHour(), timePicker.getMinute());
             }
 
             @Override
@@ -142,13 +88,16 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-                textValAlarm.setText("Alarms: " + (seekBar.getProgress() + 1));//alrms);
+                textValAlarm.setText("Alarms: " + (seekBar.getProgress() + 1));
             }
         });
+
+        //this is used to pick how many minutes between alarms
         seekBarMins.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
 
             @Override
             public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+                updateCalendar(timePicker.getHour(), timePicker.getMinute());
             }
 
             @Override
@@ -168,6 +117,7 @@ public class MainActivity extends AppCompatActivity {
     //This functions initializes all the variables
     private void initializeVariables(){
 
+        //used to store the saved user pref
         boolean alarmOn;
 
         //this is creating a file to store alarms -- file name is AlarmStorage...idk where it stores it
@@ -202,8 +152,6 @@ public class MainActivity extends AppCompatActivity {
         textValMin = (TextView) findViewById(R.id.textValSnoozeMins);
         textAlarmIndex = (TextView) findViewById(R.id.textAlarmInd);
         textAlrmDiff = (TextView) findViewById(R.id.textAlarmDiff);
-        //testButton = (Button) findViewById(R.id.button);
-        //ackButton = (Button) findViewById(R.id.buttonAck);
 
         //if the alarm is off make the Alarm time display invisible and the time till alarm
         if(!alarmOn) {
@@ -214,20 +162,13 @@ public class MainActivity extends AppCompatActivity {
             textAlrmDiff.setVisibility(View.VISIBLE);
         }
 
-        //create the alarm manager
-        //alarm_manager = (AlarmManager) getSystemService(ALARM_SERVICE);
-
-        //Setting up the intent to the AlarmReceiver Class
-        //snzIntent = new Intent(this.context , SnoozeActivity.class);
-
-
     }
 
     //this function is for updating the display of the chosen alarm time
     private  void updateTimeDisplay(int hour, int mins){
 
+        //this calendar stores the time that the alarm show go off at... only with a 24hr time range
         final Calendar calendar = Calendar.getInstance();
-
         calendar.set(Calendar.HOUR_OF_DAY, hour);
         calendar.set(Calendar.MINUTE, mins);
 
@@ -246,6 +187,7 @@ public class MainActivity extends AppCompatActivity {
             textAlrmDiff.setVisibility(View.INVISIBLE);
         }
 
+        //the rest of this function determines the number of minutes until the alarm goes off
         long diffMillis, lDiffMins, lDiffHours;
 
         //this will be the amount of time until the alarm goes off
@@ -267,16 +209,21 @@ public class MainActivity extends AppCompatActivity {
         textAlrmDiff.setText("Hours: " + lDiffHours + " Mins: " + lDiffMins);
     }
 
-    /*private*/ public void updateCalendar(int hour, int mins){
+    //this function is for creating the calendar/intent/alarm manager
+    private void updateCalendar(int hour, int mins){
 
-        final Calendar calendar = Calendar.getInstance();
+        //this intent is used to pass the switch state, minutes between alarms, and number of alarms to the pending intent
         Intent mIntent = new Intent(/*this.context*/ getApplicationContext(), AlarmReceiver.class);
         mIntent.putExtra(getResources().getString(R.string.Ex_Alarm_State), switchOn.isChecked());
-        mIntent.putExtra(getResources().getString(R.string.Ex_Snooze_Min), seekBarMins.getProgress() + 1);
-        mIntent.putExtra(getResources().getString(R.string.Ex_Alarm_Num), seekBarAlrms.getProgress() + 1);
+        mIntent.putExtra(getResources().getString(R.string.Ex_Snooze_Min), seekBarMins.getProgress()+1);
+        mIntent.putExtra(getResources().getString(R.string.Ex_Alarm_Num), seekBarAlrms.getProgress());
+
+        //this pending intent is used with the alarm manager to set up the alarm at the correct time
         PendingIntent pIntent = PendingIntent.getBroadcast(MainActivity.this, 0, mIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         AlarmManager alarm_manager = (AlarmManager) getSystemService(ALARM_SERVICE);
 
+        //this is the calendar for getting the time
+        final Calendar calendar = Calendar.getInstance();
         calendar.set(Calendar.HOUR_OF_DAY, hour );
         calendar.set(Calendar.MINUTE, mins);
 
@@ -296,6 +243,7 @@ public class MainActivity extends AppCompatActivity {
             alarm_manager.cancel(pIntent);
         }
 
+        //go to the function to update the display
         updateTimeDisplay(calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE));
     }
 
@@ -304,8 +252,8 @@ public class MainActivity extends AppCompatActivity {
         //store the shared Preferences stuff ie alarm hour, min, numbAlarms, numbMins
         editor.putInt( getResources().getString(R.string.Alarm_Hour) , timePicker.getHour());
         editor.putInt( getResources().getString(R.string.Alarm_Min) , timePicker.getMinute());
-        editor.putInt( getResources().getString(R.string.num_Alarm) , seekBarAlrms.getProgress() + 1);
-        editor.putInt( getResources().getString(R.string.num_Mins) , seekBarMins.getProgress() + 1);
+        editor.putInt( getResources().getString(R.string.num_Alarm) , seekBarAlrms.getProgress());
+        editor.putInt( getResources().getString(R.string.num_Mins) , seekBarMins.getProgress());
         editor.putBoolean( getResources().getString(R.string.alarm_On) , switchOn.isChecked());
         editor.apply();
 
