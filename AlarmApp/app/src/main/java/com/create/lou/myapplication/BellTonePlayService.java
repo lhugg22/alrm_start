@@ -2,8 +2,6 @@ package com.create.lou.myapplication;
 
 
 import android.app.Notification;
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
@@ -12,13 +10,10 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
-import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.widget.Toast;
 import android.support.v4.app.NotificationManagerCompat;
-import android.support.v7.app.AppCompatActivity;
 
-import static android.content.Intent.FLAG_ACTIVITY_PREVIOUS_IS_TOP;
 
 /**
  * Created by lou on 9/14/17.
@@ -31,7 +26,7 @@ public class BellTonePlayService extends Service {
     Uri notification;
     Ringtone r;
 
-    Intent snzIntent;// = new Intent(getApplicationContext(),AlarmReceiver.class);
+    Intent snzIntent;
 
     @Nullable
     @Override
